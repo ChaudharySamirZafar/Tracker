@@ -81,7 +81,7 @@ export default function SetupScreen({ onSetup }) {
             You'll track daily
           </p>
           <ul className="space-y-1.5">
-            {['10K Steps', '2L Water', 'Weight (kg)', 'Quran', `Under ${calorieTarget ? `${calorieTarget} kcal` : 'Calories'}`].map((item) => (
+            {['10K Steps', '2L Water', 'Weight (kg)', 'Quran', 'Under Calories'].map((item) => (
               <li key={item} className="flex items-center gap-2 text-sm text-gray-700">
                 <span className="w-1.5 h-1.5 rounded-full bg-indigo-400 flex-shrink-0" />
                 {item}
