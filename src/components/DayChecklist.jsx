@@ -19,7 +19,7 @@ function Checkbox({ checked, onChange }) {
   );
 }
 
-export default function DayChecklist({ dayData, onChange }) {
+export default function DayChecklist({ dayData, onChange, calorieTarget }) {
   const handleBool = (key) => onChange({ [key]: !dayData[key] });
 
   const handleWeight = (e) => {
@@ -31,7 +31,11 @@ export default function DayChecklist({ dayData, onChange }) {
     <div className="space-y-4">
       {HABITS.map((habit) => (
         <div key={habit.key} className="flex items-center justify-between min-h-[36px]">
-          <span className="text-sm font-medium text-gray-700">{habit.label}</span>
+          <span className="text-sm font-medium text-gray-700">
+            {habit.key === 'underCalories' && calorieTarget
+              ? `Under ${calorieTarget} kcal`
+              : habit.label}
+          </span>
           {habit.type === 'bool' ? (
             <Checkbox
               checked={!!dayData[habit.key]}

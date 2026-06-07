@@ -117,7 +117,7 @@ export default function CalendarView({ data, updateDay }) {
           <span className="text-sm font-semibold text-gray-700">Habits</span>
           <span className="text-sm font-bold text-indigo-600">{getScore(dayData)}/5</span>
         </div>
-        <DayChecklist dayData={dayData} onChange={(patch) => updateDay(currentDate, patch)} />
+        <DayChecklist dayData={dayData} onChange={(patch) => updateDay(currentDate, patch)} calorieTarget={data.calorieTarget} />
       </div>
     );
   };
@@ -194,6 +194,7 @@ export default function CalendarView({ data, updateDay }) {
           dayData={data.days[selectedDay] ?? {}}
           onUpdate={(patch) => updateDay(selectedDay, patch)}
           onClose={() => setSelectedDay(null)}
+          calorieTarget={data.calorieTarget}
         />
       )}
     </div>

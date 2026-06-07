@@ -3,7 +3,7 @@ import DayChecklist from './DayChecklist';
 import { formatDisplayDate } from '../utils/dates';
 import { getScore } from '../utils/habits';
 
-export default function DayModal({ dateKey, dayData, onUpdate, onClose }) {
+export default function DayModal({ dateKey, dayData, onUpdate, onClose, calorieTarget }) {
   useEffect(() => {
     const handler = (e) => { if (e.key === 'Escape') onClose(); };
     window.addEventListener('keydown', handler);
@@ -33,7 +33,7 @@ export default function DayModal({ dateKey, dayData, onUpdate, onClose }) {
           </button>
         </div>
         <div className="p-5">
-          <DayChecklist dayData={dayData} onChange={onUpdate} />
+          <DayChecklist dayData={dayData} onChange={onUpdate} calorieTarget={calorieTarget} />
         </div>
         {/* Score bar */}
         <div className="px-5 pb-5">

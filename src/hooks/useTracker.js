@@ -22,7 +22,8 @@ export function useTracker() {
   }, []);
 
   const setup = useCallback(
-    (startDate, endDate) => persist({ startDate, endDate, days: {} }),
+    (startDate, endDate, calorieTarget) =>
+      persist({ startDate, endDate, calorieTarget: calorieTarget || null, days: {} }),
     [persist]
   );
 
@@ -35,11 +36,17 @@ export function useTracker() {
     [data, persist]
   );
 
+  const updateSettings = useCallback(
+    (patch) => persist({ ...data, ...patch }),
+    [data, persist]
+  );
+
   return {
     data,
     isSetup: !!(data.startDate && data.endDate),
     setup,
     updateDay,
+    updateSettings,
     getDay: (k) => data.days[k] ?? {},
   };
 }

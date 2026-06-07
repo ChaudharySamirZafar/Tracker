@@ -1,9 +1,20 @@
+import { useState } from 'react';
 import { today, formatDisplayDate, diffDays } from '../utils/dates';
 import { getScore } from '../utils/habits';
 import DayChecklist from './DayChecklist';
 
-export default function TodayView({ data, updateDay }) {
+export default function TodayView({ data, updateDay, updateSettings }) {
   const todayStr = today();
+  const [calInput, setCalInput] = useState(() => String(data.calorieTarget ?? ''));
+
+  const saveCalorieTarget = () => {
+    const val = parseInt(calInput, 10);
+    if (val >= 100 && val <= 10000) {
+      updateSettings({ calorieTarget: val });
+    } else {
+      setCalInput(String(data.calorieTarget ?? ''));
+    }
+  };
   const dayData = data.days[todayStr] ?? {};
   const score = getScore(dayData);
 
@@ -46,7 +57,29 @@ export default function TodayView({ data, updateDay }) {
             />
           ))}
         </div>
-        <DayChecklist dayData={dayData} onChange={(patch) => updateDay(todayStr, patch)} />
+        <DayChecklist dayData={dayData} onChange={(patch) => updateDay(todayStr, patch)} calorieTarget={data.calorieTarget} />
+      </div>
+
+      {/* Calorie target */}
+      <div className="bg-white rounded-2xl p-4 border border-gray-100 shadow-sm">
+        <div className="flex items-center justify-between">
+          <span className="text-sm font-medium text-gray-700">Daily calorie target</span>
+          <div className="flex items-center gap-1.5">
+            <input
+              type="number"
+              min="100"
+              max="10000"
+              step="50"
+              value={calInput}
+              placeholder="—"
+              onChange={(e) => setCalInput(e.target.value)}
+              onBlur={saveCalorieTarget}
+              onKeyDown={(e) => { if (e.key === 'Enter') e.target.blur(); }}
+              className="w-20 text-right px-2 py-1 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+            />
+            <span className="text-sm text-gray-400">kcal</span>
+          </div>
+        </div>
       </div>
 
       {/* Goal progress */}

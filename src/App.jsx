@@ -66,7 +66,7 @@ const TABS = [
 ];
 
 export default function App() {
-  const { data, isSetup, setup, updateDay } = useTracker();
+  const { data, isSetup, setup, updateDay, updateSettings } = useTracker();
   const [activeTab, setActiveTab] = useState('today');
 
   if (!isSetup) {
@@ -78,7 +78,7 @@ export default function App() {
       <main className="flex-1 overflow-y-auto pb-20">
         <div className="max-w-lg mx-auto px-4 pt-6">
           {activeTab === 'calendar' && <CalendarView data={data} updateDay={updateDay} />}
-          {activeTab === 'today' && <TodayView data={data} updateDay={updateDay} />}
+          {activeTab === 'today' && <TodayView data={data} updateDay={updateDay} updateSettings={updateSettings} />}
           {activeTab === 'metrics' && <MetricsView data={data} />}
         </div>
       </main>
