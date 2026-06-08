@@ -4,6 +4,7 @@ import SetupScreen from './components/SetupScreen';
 import CalendarView from './components/CalendarView';
 import TodayView from './components/TodayView';
 import MetricsView from './components/MetricsView';
+import DayDetailView from './components/DayDetailView';
 
 function CalendarIcon({ active }) {
   return (
@@ -68,16 +69,30 @@ const TABS = [
 export default function App() {
   const { data, isSetup, setup, updateDay, updateSettings } = useTracker();
   const [activeTab, setActiveTab] = useState('today');
+  const [dayRoute, setDayRoute] = useState(null);
 
   if (!isSetup) {
     return <SetupScreen onSetup={setup} />;
+  }
+
+  if (dayRoute) {
+    return (
+      <DayDetailView
+        initialDateKey={dayRoute}
+        data={data}
+        updateDay={updateDay}
+        onBack={() => setDayRoute(null)}
+      />
+    );
   }
 
   return (
     <div className="flex flex-col min-h-screen bg-gray-50">
       <main className="flex-1 overflow-y-auto pb-20">
         <div className="max-w-lg mx-auto px-4 pt-6">
-          {activeTab === 'calendar' && <CalendarView data={data} updateDay={updateDay} />}
+          {activeTab === 'calendar' && (
+            <CalendarView data={data} updateDay={updateDay} onSelectDay={setDayRoute} />
+          )}
           {activeTab === 'today' && <TodayView data={data} updateDay={updateDay} updateSettings={updateSettings} />}
           {activeTab === 'metrics' && <MetricsView data={data} />}
         </div>

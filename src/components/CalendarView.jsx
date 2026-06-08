@@ -10,7 +10,6 @@ import {
   formatDate,
 } from '../utils/dates';
 import { getScore } from '../utils/habits';
-import DayModal from './DayModal';
 import DayChecklist from './DayChecklist';
 
 const WEEKDAYS_SHORT = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
@@ -44,18 +43,13 @@ function MonthCell({ dateKey, dayData, isToday, onClick }) {
   );
 }
 
-export default function CalendarView({ data, updateDay }) {
+export default function CalendarView({ data, updateDay, onSelectDay }) {
   const todayStr = today();
   const [view, setView] = useState('month');
   const [currentDate, setCurrentDate] = useState(todayStr);
-  const [selectedDay, setSelectedDay] = useState(null);
+  const [weekSelected, setWeekSelected] = useState(null);
 
   const curParts = currentDate.split('-').map(Number);
-
-  const switchView = (v) => {
-    setView(v);
-    setSelectedDay(null);
-  };
 
   const navigate = (dir) => {
     const d = parseDate(currentDate);
@@ -67,8 +61,8 @@ export default function CalendarView({ data, updateDay }) {
       const newDate = formatDate(d);
       setCurrentDate(newDate);
       const weekDays = getWeekDays(newDate);
-      if (selectedDay && !weekDays.includes(selectedDay)) {
-        setSelectedDay(weekDays.includes(todayStr) ? todayStr : null);
+      if (weekSelected && !weekDays.includes(weekSelected)) {
+        setWeekSelected(weekDays.includes(todayStr) ? todayStr : null);
       }
     } else {
       d.setDate(d.getDate() + dir);
@@ -115,7 +109,7 @@ export default function CalendarView({ data, updateDay }) {
                 dateKey={dateKey}
                 dayData={data.days[dateKey]}
                 isToday={dateKey === todayStr}
-                onClick={() => setSelectedDay(dateKey)}
+                onClick={() => onSelectDay(dateKey)}
               />
             ) : (
               <div key={`e-${i}`} />
@@ -129,8 +123,8 @@ export default function CalendarView({ data, updateDay }) {
   const renderWeek = () => {
     const weekDays = getWeekDays(currentDate);
     const active =
-      selectedDay && weekDays.includes(selectedDay)
-        ? selectedDay
+      weekSelected && weekDays.includes(weekSelected)
+        ? weekSelected
         : weekDays.includes(todayStr)
         ? todayStr
         : weekDays[0];
@@ -140,7 +134,6 @@ export default function CalendarView({ data, updateDay }) {
 
     return (
       <div className="space-y-3">
-        {/* Day strip */}
         <div className="grid grid-cols-7 gap-1">
           {weekDays.map((dateKey, i) => {
             const score = getScore(data.days[dateKey]);
@@ -150,36 +143,23 @@ export default function CalendarView({ data, updateDay }) {
             return (
               <button
                 key={dateKey}
-                onClick={() => setSelectedDay(dateKey)}
+                onClick={() => setWeekSelected(dateKey)}
                 className={`flex flex-col items-center gap-0.5 py-3 rounded-xl transition-colors active:scale-95
                   ${isActive ? 'bg-indigo-600' : isToday ? 'bg-indigo-50 hover:bg-indigo-100' : 'hover:bg-gray-100'}
                 `}
               >
-                <span
-                  className={`text-[9px] font-bold uppercase tracking-wide ${
-                    isActive ? 'text-indigo-300' : 'text-gray-400'
-                  }`}
-                >
+                <span className={`text-[9px] font-bold uppercase tracking-wide ${isActive ? 'text-indigo-300' : 'text-gray-400'}`}>
                   {WEEKDAYS_SHORT[i]}
                 </span>
-                <span
-                  className={`text-base font-bold leading-none ${
-                    isActive ? 'text-white' : isToday ? 'text-indigo-600' : 'text-gray-800'
-                  }`}
-                >
+                <span className={`text-base font-bold leading-none ${isActive ? 'text-white' : isToday ? 'text-indigo-600' : 'text-gray-800'}`}>
                   {day}
                 </span>
-                <div
-                  className={`w-1.5 h-1.5 rounded-full mt-0.5 ${
-                    score > 0 ? (isActive ? 'bg-indigo-300' : 'bg-indigo-500') : 'bg-transparent'
-                  }`}
-                />
+                <div className={`w-1.5 h-1.5 rounded-full mt-0.5 ${score > 0 ? (isActive ? 'bg-indigo-300' : 'bg-indigo-500') : 'bg-transparent'}`} />
               </button>
             );
           })}
         </div>
 
-        {/* Inline checklist for active day */}
         <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
           <div className="flex items-center justify-between px-5 py-4 border-b border-gray-50">
             <div>
@@ -188,20 +168,12 @@ export default function CalendarView({ data, updateDay }) {
             </div>
             <div className="flex gap-1">
               {Array.from({ length: 5 }, (_, i) => (
-                <div
-                  key={i}
-                  className={`w-1.5 h-1.5 rounded-full transition-colors ${
-                    i < activeScore ? 'bg-indigo-500' : 'bg-gray-200'
-                  }`}
-                />
+                <div key={i} className={`w-1.5 h-1.5 rounded-full transition-colors ${i < activeScore ? 'bg-indigo-500' : 'bg-gray-200'}`} />
               ))}
             </div>
           </div>
           <div className="px-5 py-4">
-            <DayChecklist
-              dayData={activeData}
-              onChange={(patch) => updateDay(active, patch)}
-            />
+            <DayChecklist dayData={activeData} onChange={(patch) => updateDay(active, patch)} />
           </div>
         </div>
       </div>
@@ -225,12 +197,11 @@ export default function CalendarView({ data, updateDay }) {
 
   return (
     <div>
-      {/* View toggle */}
       <div className="flex gap-1 p-1 bg-gray-100 rounded-xl mb-4">
         {['month', 'week', 'day'].map((v) => (
           <button
             key={v}
-            onClick={() => switchView(v)}
+            onClick={() => setView(v)}
             className={`flex-1 py-1.5 text-sm rounded-lg font-semibold transition-colors capitalize ${
               view === v ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700'
             }`}
@@ -240,7 +211,6 @@ export default function CalendarView({ data, updateDay }) {
         ))}
       </div>
 
-      {/* Nav header */}
       <div className="flex items-center justify-between mb-4">
         <button onClick={() => navigate(-1)} className="p-2 rounded-xl hover:bg-gray-100 transition-colors">
           <svg className="w-5 h-5 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -259,26 +229,15 @@ export default function CalendarView({ data, updateDay }) {
       {view === 'week' && renderWeek()}
       {view === 'day' && renderDay()}
 
-      {/* Jump to today */}
       {currentDate !== todayStr && (
         <div className="mt-4 flex justify-center">
           <button
-            onClick={() => { setCurrentDate(todayStr); setSelectedDay(null); }}
+            onClick={() => setCurrentDate(todayStr)}
             className="text-xs text-indigo-500 font-semibold hover:text-indigo-700 px-3 py-1.5 rounded-lg hover:bg-indigo-50 transition-colors"
           >
             Jump to today
           </button>
         </div>
-      )}
-
-      {/* Month-view modal */}
-      {selectedDay && view === 'month' && (
-        <DayModal
-          dateKey={selectedDay}
-          dayData={data.days[selectedDay] ?? {}}
-          onUpdate={(patch) => updateDay(selectedDay, patch)}
-          onClose={() => setSelectedDay(null)}
-        />
       )}
     </div>
   );
